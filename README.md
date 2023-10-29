@@ -1,4 +1,4 @@
-# lboxd
+# pyletterboxd
 A python library for accessing list and film data from letterboxd.
 
 NOTE: This library is in no way affiliated with letterboxd.com. It is meant for
