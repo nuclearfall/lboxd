@@ -3,7 +3,19 @@ from bs4 import BeautifulSoup
 
 class Letterboxd:
 	def __init__(self, username=None, password=None, session=requests.session()):
-		if username and password:
+		"""
+		Parameters
+		----------
+		username : str
+			letterboxd username
+		password : str
+			letterboxd password
+		session : requests.session
+			use a session or default session
+		"""
+
+		if username and password and not session.cookies.get_dict.get(
+				"letterboxd.signed.in.as"):
 			try:
 				self.session = letterboxd_session(username, password)
 			except:
@@ -24,6 +36,17 @@ class Letterboxd:
 
 		return lb.get(url, session=self.session).to_dict()
 
+	def get_films(self, film_urls):
+		films = {}
+
+		for film_url in film_urls:
+			films[film_url] = self.get(film_url)
+
+		return films
+
+	def get_films_dict(self, film_urls):
+		return {k:v.to_dict() for k, v in self.get_film(film_urls).items()}
+
 	def user_lists(self, username):
 		lists_url = f'https://letterboxd.com/{username}/lists'
 		film_lists = {}
@@ -39,19 +62,8 @@ class Letterboxd:
 
 		return film_lists
 
-	def get_films(self, film_urls):
-		films = {}
-
-		for film_url in film_urls:
-			films[film_url] = self.get(film_url)
-
-		return films
-
 	def user_lists_dict(self, username):
 		return {k:v.to_dict() for k, v in self.user_lists(username).items()}
-
-	def get_films_dict(self, film_urls):
-		return {k:v.to_dict() for k, v in self.get_film(film_urls).items()}
 
 
 class LetterboxdList:
@@ -177,6 +189,21 @@ def page_range(self, html):
 	return range(1, int(li_tags[-1].find("a").text)+1) if li_tags else range(1, 2)
 
 
+def listurl(url):
+	return url if url.endswith('/') else f'{url}/'
+
+
+def user_and_list_name(list_url):
+	return [key for key in list_url.split("/") if key not in [
+		'http:', 
+		'https:', '', 
+		'letterboxd.com', 
+		'www.letterboxd.com',
+		'list',
+		'reviews']
+	]
+	
+
 # def letterboxd_export(list_url, session=requests, path):
 # 	csv_str = csv_export(films)
 # 	tmp_path = Path(tmpdir).joinpath('export.csv')
@@ -191,34 +218,21 @@ def page_range(self, html):
 # 	return export
 
 
-def letterboxd_import(path_to_csv, driver, **kwargs):
-	driver.get('https://letterboxd.com/list/new')	
-	for k, v in kwargs.items():
-		try:
-			elem = driver.find_element(By.NAME, k)
-			elem.send_keys(v)
-		except:
-			print(f'No element named: {k}')
-	str(path_to_csv)
-	import_button = driver.find_element(By.NAME, 'file')
-	import_button.send_keys(str(tmp_path))
-	import_button.send_keys(Keys.ENTER)
-	WebDriverWait(driver, 20).until(EC.element_to_be_clickable(
-			(By.XPATH, '//*[@id="content"]/div/div/a[2]')))
-	driver.find_element(By.XPATH, '//*[@id="content"]/div/div/a[2]').click()
-	driver.find_element(By.ID, 'list-edit-save').click()
+# def letterboxd_import(path_to_csv, driver, **kwargs):
+# 	driver.get('https://letterboxd.com/list/new')	
+# 	for k, v in kwargs.items():
+# 		try:
+# 			elem = driver.find_element(By.NAME, k)
+# 			elem.send_keys(v)
+# 		except:
+# 			print(f'No element named: {k}')
+# 	str(path_to_csv)
+# 	import_button = driver.find_element(By.NAME, 'file')
+# 	import_button.send_keys(str(tmp_path))
+# 	import_button.send_keys(Keys.ENTER)
+# 	WebDriverWait(driver, 20).until(EC.element_to_be_clickable(
+# 			(By.XPATH, '//*[@id="content"]/div/div/a[2]')))
+# 	driver.find_element(By.XPATH, '//*[@id="content"]/div/div/a[2]').click()
+# 	driver.find_element(By.ID, 'list-edit-save').click()
 
-	return True
-
-def user_and_list_name(list_url):
-	return [key for key in list_url.split("/") if key not in [
-		'http:', 
-		'https:', '', 
-		'letterboxd.com', 
-		'www.letterboxd.com',
-		'list',
-		'reviews']
-	]
-#list-items-editor > div.list-items-header-wrap > header > div.wrap > fieldset > a
-
-	
+# 	return True
