@@ -1,6 +1,10 @@
 # letterboxd
 A python library for accessing list and film data from letterboxd.
 
+NOTE: This library is in no way affiliated with letterboxd.com. It is meant for
+education purposes only. Letterboxd does not have an official API.
+
+
 ## example usage:
 ```
 import letterboxd as lboxd
