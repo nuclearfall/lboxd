@@ -71,7 +71,7 @@ class LetterboxdList:
 
 	def get(list_url, session=requests):
 		self.username, self.listname = user_and_list_name(self.list_url)
-		self.list_url = listurl(list_url)
+		self.list_url = cleanurl(list_url)
 		html = session.get(self.list_url).text
 		lists_data = {}
 
@@ -94,12 +94,9 @@ class LetterboxdList:
 
 
 class LetterboxdFilm:
-	film_url = lbxd_id = lbxd_uri = tmdb_id = title = year = ''
-	posters = backdrops = genres = []
-	rating = -1
-
 	def get(self, film_url, session=requests.session()):
-		req = session.get(film_url)
+		self.film_url = cleanurl(film_url)
+		req = session.get(self.film_url)
 		soup = BeautifulSoup(req.text, 'lxml')
 		bddiv = soup.find('div', id='backdrop')
 		backdrop_list = ['data-backdropmobile', 'data-backdrop', 'data-backdrop2x']
@@ -189,7 +186,7 @@ def page_range(self, html):
 	return range(1, int(li_tags[-1].find("a").text)+1) if li_tags else range(1, 2)
 
 
-def listurl(url):
+def cleanurl(url):
 	return url if url.endswith('/') else f'{url}/'
 
 
