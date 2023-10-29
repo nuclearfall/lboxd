@@ -19,6 +19,11 @@ class Letterboxd:
 
 		return lb.get(url, session=self.session)
 
+	def get_dict(self, url, is_film=True):
+		lb = LetterboxdFilm() if is_film else LetterboxdList()
+
+		return lb.get(url, session=self.session).to_dict()
+
 	def user_lists(self, username):
 		lists_url = f'https://letterboxd.com/{username}/lists'
 		film_lists = {}
